@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>email form</title>
+  </head>
+  <body>
+    <form action="/email_post" method="post">
+      email:<input type="text" name="email" value="1@naver.com"><br/>
+      <input type="submit">
+    </form>
+
+    <button class="ajaxsend">ajaxsend</button>
+    <div class="result"></div>
+
+    <script>
+      document.querySelector('.ajaxsend').addEventListener('click', function(){
+        console.log("ajaxsend Start")
+        var inputdata = document.forms[0].elements[0].value; // document.forms[0], elements[0] : form테그의 첫번째 element, value : email input
+        sendAjax('http://localhost:3000/ejax_send_email',inputdata);
+      });
+
+      function sendAjax(url, data){
+        var data = {'email' : data}; // client의 폼을 json형태로 담아서
+        data = JSON.stringify(data);  // 문자열로 변환
+
+        var xhr = new XMLHttpRequest(); // XMLHttpRequest 객체 생성
+        xhr.open('POST', url);  // POST로 보내기, 비동기 방식으로 Request를 오픈
+        xhr.setRequestHeader('Content-Type', "application/json"); // 서버로 send전에 해줘야 함, 서버로 보낼 때 json 형태, 데이터를 보낼 때 타입이 지정되어 있어 이대로 보내야함
+        xhr.send(data); // send에 data(브라우저에서 email data입력된 data)를 담아서 보냄
+
+        xhr.addEventListener('load', function(){
+        console.log(xhr.responseText);  // 응답체크
+        var result = JSON.parse(xhr.responseText);  // 문자열이므로 json.parse 필요함
+        if(result.result !== "OK") return;
+        document.querySelector(".result").innerHTML = result.email;
+      });
+
+    }
+    </script>
+
+  </body>
+</html>
